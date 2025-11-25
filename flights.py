@@ -3,6 +3,7 @@ from ryanair import Ryanair
 from ryanair.types import Flight
 from tabulate import tabulate
 
+
 def print_flights_pretty(flights: list[Flight]):
     if not flights:
         print("No flights found.")
@@ -10,21 +11,24 @@ def print_flights_pretty(flights: list[Flight]):
 
     table = []
     for f in flights:
-        table.append([
-            f.departureTime.strftime("%Y-%m-%d %H:%M"),
-            f.destinationFull,
-            f.flightNumber,
-            f"{f.price:.2f}",
-            f.currency
-        ])
+        table.append(
+            [
+                f.departureTime.strftime("%Y-%m-%d %H:%M"),
+                f.destinationFull,
+                f.flightNumber,
+                f"{f.price:.0f}",
+                f.currency,
+            ]
+        )
 
     print("\n=== Cheapest Flights ===")
-    print(tabulate(
-        table,
-        headers=["Departure", "Destination", "Flight No.", "Price", "Currency"],
-        tablefmt="fancy_grid"
-    ))
-
+    print(
+        tabulate(
+            table,
+            headers=["Departure", "Destination", "Flight No.", "Price", "Currency"],
+            tablefmt="fancy_grid",
+        )
+    )
 
 
 def get_n_cheapest_flights(origin: str, date, n: int = 5, currency="CZK"):
@@ -50,4 +54,3 @@ if __name__ == "__main__":
 
     cheapest = get_n_cheapest_flights(origin, date, number_of_flights, currency="CZK")
     print_flights_pretty(cheapest)
-
