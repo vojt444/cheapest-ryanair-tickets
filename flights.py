@@ -1,22 +1,30 @@
 from datetime import datetime, timedelta
 from ryanair import Ryanair
 from ryanair.types import Flight
+from tabulate import tabulate
 
 def print_flights_pretty(flights: list[Flight]):
-    """Print a nice table-like output of flights."""
     if not flights:
         print("No flights found.")
         return
 
-    print("\n=== Cheapest Flights ===")
-    print(f"{'Departure':<20} {'Destination':<10} {'Price':<10} {'Currency':<10}")
-    print("-" * 50)
-
+    table = []
     for f in flights:
-        dep = f.departureTime.strftime("%Y-%m-%d %H:%M")
-        print(f"{dep:<20} {f.destination:<10} {f.price:<10} {f.currency:<10}")
+        table.append([
+            f.departureTime.strftime("%Y-%m-%d %H:%M"),
+            f.destinationFull,
+            f.flightNumber,
+            f"{f.price:.2f}",
+            f.currency
+        ])
 
-    print("-" * 50)
+    print("\n=== Cheapest Flights ===")
+    print(tabulate(
+        table,
+        headers=["Departure", "Destination", "Flight No.", "Price", "Currency"],
+        tablefmt="fancy_grid"
+    ))
+
 
 
 def get_n_cheapest_flights(origin: str, date, n: int = 5, currency="CZK"):
@@ -26,7 +34,7 @@ def get_n_cheapest_flights(origin: str, date, n: int = 5, currency="CZK"):
     api = Ryanair(currency=currency)
 
     # Ryanair API expects a date range → from `date` to `date + 1 day`
-    flights = api.get_cheapest_flights(origin.upper(), date, date + timedelta(days=1))
+    flights = api.get_cheapest_flights(origin.upper(), date, date + timedelta(days=0))
 
     # Sort by price (already sorted, but just in case)
     flights = sorted(flights, key=lambda f: f.price)
